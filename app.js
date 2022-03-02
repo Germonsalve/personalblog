@@ -6,7 +6,9 @@ const ejs = require("ejs");
 const _ = require("lodash");
 const mongoose = require("mongoose");
 
-mongoose.connect("mongodb://localhost:27017/blogDB", {useNewUrlParser: true});
+mongoose.connect("mongodb://localhost:27017/blogDB", {
+  useNewUrlParser: true
+});
 
 // DATABASE WITH MONGOOSE
 
@@ -27,77 +29,88 @@ const app = express();
 
 app.set('view engine', 'ejs');
 
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
 app.use(express.static("public"));
 
 
 
-app.get("/", function(req, res){
-  Post.find({},function(err,posts){
+app.get("/", function(req, res) {
+  Post.find({}, function(err, posts) {
     res.render("home", {
       startingContent: homeStartingContent,
       posts: posts
-      });
+    });
   });
-  });
-
-app.get("/about", function(req, res){
-  res.render("about", {aboutContent: aboutContent});
 });
 
-app.get("/contact", function(req, res){
-  res.render("contact", {contactContent: contactContent});
+app.get("/about", function(req, res) {
+  res.render("about", {
+    aboutContent: aboutContent
+  });
 });
 
-app.get("/compose", function(req, res){
+app.get("/contact", function(req, res) {
+  res.render("contact", {
+    contactContent: contactContent
+  });
+});
+
+app.get("/compose", function(req, res) {
   res.render("compose");
 });
 
-app.post("/compose", function(req, res){
+app.post("/compose", function(req, res) {
   const post = new Post({
     title: req.body.postTitle,
     content: req.body.postBody
   });
 
-  post.save(function(err){
-    if(!err){
-        res.redirect("/");
+  post.save(function(err) {
+    if (!err) {
+      res.redirect("/");
     }
   });
 });
 
 //RENDER OF THE DIFERENTS POST SAVED ON THE DATABASE
-app.get("/posts/:postId", function(req, res){
+app.get("/posts/:postId", function(req, res) {
   const requestedTitle = _.lowerCase(req.params.postName);
   const requestedPostId = req.params.postId;
 
-  Post.find({_id: requestedPostId},function(err,posts){
-    Post.findOne({_id: requestedPostId}, function(err, post){
+  Post.find({
+    _id: requestedPostId
+  }, function(err, posts) {
+    Post.findOne({
+      _id: requestedPostId
+    }, function(err, post) {
 
-   res.render("post", {
+      res.render("post", {
 
-     title: post.title,
+        title: post.title,
 
-     content: post.content,
+        content: post.content,
 
-     postId: post._id
+        postId: post._id
 
-   });
- });
-});
+      });
+    });
+  });
 });
 
 //Delete Posts from the delete button
 
-app.get("/delete", function(req,res){
-  const requestedPostId = req.query.postId;
-  console.log(req.body);
+app.get("/delete", function(req, res) {
+  const requestedPostId = req.query.delete;
 
-  Post.findOneAndDelete({_id: requestedPostId}, function(err){
-    if(!err){
-    res.redirect("/")
-  }
-});
+  Post.findOneAndDelete({
+    _id: requestedPostId
+  }, function(err) {
+    if (!err) {
+      res.redirect("/")
+    }
+  });
 });
 
 app.listen(3000, function() {
